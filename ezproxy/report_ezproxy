@@ -1,0 +1,31 @@
+#!/bin/bash
+
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#   Jason C. Rochon                                                                   #
+#   Nov 05, 2015                                                                      #
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+perl -ne '/(\S+) has (\d+) foreign connections.* (\d+) unique known countries/; 
+print "\n$ARGV "; 
+if ($2 > 999 or $3 > 1) {print "$1 $2 $3"};' /var/log/ezproxy_abuses.20* | 
+uniq
+
+echo -e "\nCompromised 'Sci-Hub.org' Accounts:"
+for j in `zgrep -E 'sci\-hub\.|T8722537' /var/log/ezproxy* | awk '{print $3}' | sort -u` ;
+do zgrep $j /usr/local/ezproxy-5.2/audit/* | awk '$4 !~ /^[[:digit:]]/ {print $4}' ;
+done |
+sort -u
+
+#echo -e "\nPossibly Registering Accounts:"
+#for j in `zgrep -i 'register' /var/log/ezproxy* | awk '{print $3}' | sort -u` ;
+#do zgrep $j /usr/local/ezproxy-5.2/audit/* | awk '$4 !~ /^[[:digit:]]/ {print $4}' ;
+#done |
+#sort -u
+
+echo -e "\n"
+for j in /var/log/ezproxy.{1..7}.gz ;
+do echo $j ; zcat $j | head -1 | egrep -oh '[0-9]{2}\/...\/[0-9]{4}';
+done
+
+echo -e "\n"
+
